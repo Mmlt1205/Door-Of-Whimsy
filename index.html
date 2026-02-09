@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Door Of Whimsy ✨</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Poppins",sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#ffd6eb,#fff5fa);
+  min-height:100vh;
+}
+
+/* HEADER */
+
+header{
+  background:#ff4f8b;
+  color:white;
+  text-align:center;
+  padding:25px;
+  font-size:32px;
+  letter-spacing:3px;
+  font-weight:700;
+  text-shadow:0 0 10px pink;
+}
+
+/* HERO */
+
+.hero{
+  padding:40px 20px;
+  text-align:center;
+}
+
+.hero h1{
+  font-size:42px;
+  color:#ff357a;
+}
+
+.hero p{
+  margin-top:10px;
+  font-size:18px;
+  color:#555;
+}
+
+/* CART BUTTON */
+
+.cart-btn{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:white;
+  padding:15px 20px;
+  border-radius:20px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  cursor:pointer;
+  z-index:100;
+}
+
+.cart-btn span{
+  color:#ff357a;
+  font-weight:bold;
+}
+
+/* PRODUCTS */
+
+.products{
+  padding:40px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:30px;
+}
+
+/* CARD */
+
+.card{
+  background:white;
+  border-radius:25px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  transition:0.4s;
+  cursor:pointer;
+}
+
+.card:hover{
+  transform:scale(1.07);
+}
+
+.card img{
+  width:120px;
+  margin-bottom:10px;
+}
+
+.card h3{
+  color:#ff357a;
+}
+
+.price{
+  margin:5px 0;
+  color:#444;
+}
+
+.card button{
+  background:#ff4f8b;
+  border:none;
+  color:white;
+  padding:8px 18px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:200;
+}
+
+.modal-content{
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  width:320px;
+  text-align:center;
+}
+
+.modal-content h2{
+  color:#ff357a;
+}
+
+.modal-content p{
+  margin:10px 0;
+}
+
+.close{
+  margin-top:15px;
+  background:#ddd;
+  border:none;
+  padding:6px 15px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+/* CART MODAL */
+
+#cartModal .modal-content{
+  max-height:400px;
+  overflow:auto;
+}
+
+/* FOOTER */
+
+footer{
+  background:#ff4f8b;
+  color:white;
+  text-align:center;
+  padding:20px;
+  margin-top:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+✨ DOOR OF WHIMSY ✨
+</header>
+
+<div class="cart-btn" onclick="openCart()">
+🛒 Cart: <span id="count">0</span>
+</div>
+
+<section class="hero">
+<h1>Welcome to Door Of Whimsy 💗</h1>
+<p>Where Cute Meets Chaos ✨🐱💅</p>
+</section>
+
+<section class="products" id="products"></section>
+
+<footer>
+Made with 💗 | © 2026 Door Of Whimsy
+</footer>
+
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <h2 id="pName"></h2>
+    <p id="pDesc"></p>
+    <p><b id="pPrice"></b></p>
+    <button onclick="addFromModal()">Add to Cart</button>
+    <br>
+    <button class="close" onclick="closeProduct()">Close</button>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal" id="cartModal">
+  <div class="modal-content">
+    <h2>Your Cart 🛍️</h2>
+    <div id="cartItems"></div>
+    <p><b>Total: ₹<span id="total">0</span></b></p>
+    <button class="close" onclick="closeCart()">Close</button>
+  </div>
+</div>
+
+
+<script>
+
+/* PRODUCT DATA */
+
+const products = [
+
+{ name:"Kitty Plushie Pink", price:999, img:"plush1.png",
+  desc:"Soft premium Hello Kitty plushie. Super cuddly 💕" },
+
+{ name:"Kitty Plushie White", price:1099, img:"plush2.png",
+  desc:"Classic white kitty plush. Limited edition ✨" },
+
+{ name:"Kitty Plushie Mini", price:899, img:"plush3.png",
+  desc:"Cute mini plush. Perfect gift 🎁" },
+
+{ name:"Keychain Bow", price:299, img:"key1.png",
+  desc:"Pink bow keychain. Light & durable 💗" },
+
+{ name:"Keychain Star", price:349, img:"key2.png",
+  desc:"Star kitty charm. Premium finish 🌟" },
+
+{ name:"Keychain Heart", price:279, img:"key3.png",
+  desc:"Heart design keychain. Super cute ❤️" },
+
+{ name:"Nail Art Set Rose", price:499, img:"nail1.png",
+  desc:"Glossy rose press-on nails 💅" },
+
+{ name:"Nail Art Set Pearl", price:549, img:"nail2.png",
+  desc:"Pearl finish luxury nails ✨" },
+
+{ name:"Nail Art Set Kitty", price:599, img:"nail3.png",
+  desc:"Hello Kitty themed nails 🐱" },
+
+{ name:"Pink Uggs", price:3999, img:"ugg1.png",
+  desc:"Soft pink winter uggs ❄️" },
+
+{ name:"White Uggs", price:4299, img:"ugg2.png",
+  desc:"Snow white cozy boots 🤍" },
+
+{ name:"Classic Uggs", price:4599, img:"ugg3.png",
+  desc:"Classic brown premium uggs 🤎" }
+
+];
+
+
+/* RENDER PRODUCTS */
+
+const list = document.getElementById("products");
+
+products.forEach((p,i)=>{
+
+  list.innerHTML += `
+  <div class="card" onclick="showProduct(${i})">
+    <img src="${p.img}">
+    <h3>${p.name}</h3>
+    <div class="price">₹${p.price}</div>
+    <button>Add</button>
+  </div>
+  `;
+
+});
+
+
+/* PRODUCT MODAL */
+
+let current = null;
+
+function showProduct(i){
+
+  current = products[i];
+
+  document.getElementById("pName").innerText = current.name;
+  document.getElementById("pDesc").innerText = current.desc;
+  document.getElementById("pPrice").innerText = "₹"+current.price;
+
+  document.getElementById("productModal").style.display="flex";
+}
+
+function closeProduct(){
+  document.getElementById("productModal").style.display="none";
+}
+
+function addFromModal(){
+  cart.push(current);
+  updateCart();
+  closeProduct();
+}
+
+
+/* CART SYSTEM */
+
+let cart = [];
+
+function updateCart(){
+
+  document.getElementById("count").innerText = cart.length;
+
+  let html="";
+  let total=0;
+
+  cart.forEach((c,i)=>{
+
+    total += c.price;
+
+    html += `
+    <p>
+      ${c.name} - ₹${c.price}
+      <button onclick="remove(${i})">❌</button>
+    </p>
+    `;
+  });
+
+  document.getElementById("cartItems").innerHTML = html;
+  document.getElementById("total").innerText = total;
+}
+
+function remove(i){
+  cart.splice(i,1);
+  updateCart();
+}
+
+function openCart(){
+  document.getElementById("cartModal").style.display="flex";
+}
+
+function closeCart(){
+  document.getElementById("cartModal").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
